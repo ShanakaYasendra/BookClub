@@ -1,0 +1,39 @@
+{% extends "mainPagelayout.html" %}
+{% block search %}
+    <div class="container">
+        <div class="row text-center">
+            <h3 class="mt-5">{{ book.title }} by {{ book.author }} ({{ book.year }})</h3>
+            <p class="lead">
+                ISBN: {{ book.isbn }}<br>
+                Number of ratings: {{ review_nums['ratings_count'] }}<br>
+                Average rating: {{ review_nums['average_rating'] }}<br>
+            </p>
+        </div>
+    </div>
+    <div class="card card-outline-secondary my-4 text-center">
+        <div class="card-header">User Reviews</div>
+        {% for review in reviews %}
+            <div class="card-body">
+                <small class="text-muted">{{ review.username }} rated {{ review.rating }}/5 on {{ review.review_date}}</small>
+                <p>{{ review.review }}</p>
+                <hr>
+            </div>
+        {% else %}
+        <p><i>No reviews yet!</i></p>
+        {% endfor %}
+    <div>
+        {% if reviewed %}
+            <button type="button" class="btn btn-primary btn-lg" onclick="reviewedNotify()">Write a review</button>
+            <script>
+            function reviewedNotify() {
+                alert("You have already reviewed this book.");
+            }
+            </script>
+        {% else %}
+            <a href="{{ url_for('review', isbn=book.isbn, title=book.title, author=book.author) }}">
+                <button type="button" class="btn btn-primary btn-lg">Write a review
+                </button>
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}

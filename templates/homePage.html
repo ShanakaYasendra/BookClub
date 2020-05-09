@@ -1,0 +1,15 @@
+{%extends "mainPagelayout.html" %}
+{% block title %}Home{% endblock %}
+{% block search %}
+
+<form action="{{ url_for('search') }}" method="POST"> 
+<div class="input-group">
+
+    <input type="text" class="form-control" placeholder="Book Name, Author, ISBN" aria-label="Enter details to search" aria-describedby="button-addon4" name="qvalue">
+    <div class="input-group-append" id="button-addon4">
+      <button class="btn btn-outline-secondary" type="submit">Search</button>
+     
+    </div>
+  </div>
+</form>
+{% endblock %}

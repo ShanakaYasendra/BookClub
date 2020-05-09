@@ -1,0 +1,49 @@
+{% extends "mainPagelayout.html" %}
+
+{% block head %}
+{{super()}}
+<style>
+    #row{
+        background-image: url("{{ url_for('static', filename='image/book.jpg') }}");
+    }
+    #bg{
+        background-color: aliceblue;
+        background-image: none;
+
+    }
+    .input-group{
+    margin: 5vh;
+    align-items: center;
+}
+    
+
+    
+</style>
+{% endblock %}
+{% block title %}Search{% endblock %}
+
+{% block search %}
+
+            
+            <form action="{{ url_for('search') }}" method="POST"> 
+                <div class="input-group">
+                
+                    <input type="text" class="form-control" placeholder="Book Name, Author, ISBN" aria-label="Enter details to search" aria-describedby="button-addon4" name="qvalue">
+                    <div class="input-group-append" id="button-addon4">
+                      <button class="btn btn-outline-secondary" type="submit">Search</button>
+                     
+                    </div>
+                </div>
+             </form>
+             <h1 class="mt-5 text-center">Search Results</h1>  
+   
+  
+   
+    <div class="list-group">
+        {% for entry in results %}
+        <a href="{{ url_for('books',isbn=entry.isbn) }}" class="list-group-item list-group-item-action">{{ entry.title }} by {{ entry.author }}<br>ISBN: {{ entry.isbn }}</a>
+        {% else %}
+            <p class="lead">No matches found!</p>
+        {% endfor %}
+    </div>
+{% endblock %}
