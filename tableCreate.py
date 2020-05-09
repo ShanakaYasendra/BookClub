@@ -30,7 +30,7 @@ def create_tables():
             'rating SMALLINT NOT NULL, '
             'review_date DATE NOT NULL, '
             'book_id VARCHAR NOT NULL, FOREIGN KEY(book_id) REFERENCES books(isbn),'
-            'username VARCHAR NOT NULL)')
+            'userid INT NOT NULL)')
         )
     for command in commands:
         db.execute(command)

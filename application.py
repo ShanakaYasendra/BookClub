@@ -24,9 +24,11 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
+#Register the user
 @app.route("/userregister", methods=["POST"])
 def userregister():
-    """ get data from the form to Register"""
+   
+   # Get the data from user registration form
     error = None
     username = request.form.get("username")
     password = request.form.get("password")
@@ -34,6 +36,8 @@ def userregister():
     name = request.form.get("name")
     email = request.form.get("email")
     h = sha256_crypt.encrypt(password)
+
+    # Validate the data from the form
 
     if username=='' or password =='' or name=='' or email=='' :
         error='You need to fill all the fields !'
@@ -45,22 +49,31 @@ def userregister():
     elif password != confirmPassword:
         error= 'Password is not match with the Confirm Password'
         return render_template("register.html", error=error)
-    else:
 
-        db.execute("INSERT INTO users(username,password,name,email) VALUES (:username, :password, :name,:email)",
-        {"username": username,"password":h ,"name": name, "email":email})
-        db.commit()
+        # Create the user and update the table
+    else:
+        try:
+            db.execute("INSERT INTO users(username,password,name,email) VALUES (:username, :password, :name,:email)",
+            {"username": username,"password":h ,"name": name, "email":email})
+            db.commit() 
+            session["USERNAME"] = username           
+            return render_template("homePage.html")
+
+        except Exception as e:
+            flash ("Can not create the user !")
+            print(e)
+            error = "Something is not right"
+            return render_template("error.html", error=error)	
+
          
-        return render_template("loginPage.html")
+        
 
             
-    
-           
-   
 @app.route("/login", methods=["POST"])   
 def userlogin():
 
-    error =''
+    error = None
+    #Validate the username and Password
     try:
         username = request.form.get("username")
         password = request.form.get("password")
@@ -97,8 +110,8 @@ def userlogin():
 
     except Exception as e:
         print(e)
-        error = "Something is not right"
-        return render_template("error.html", error=error)	
+        error = "Invalid credentials, try again."
+        return render_template("loginPage.html", error=error)
          
 @app.route("/search", methods=["POST"])
 def search():
@@ -121,21 +134,27 @@ def search():
 def books(isbn):
     try:
         r_count=review_counts(isbn)
+        if r_count =='Response [404]':
+         print(error)
+         return render_template('bookPage.html', error=error)
 
     except Exception as e:
         error = "ISBN is Invalid"
         print(error)
-        return render_template('resultsPage.html', error=error)
+        return render_template('error.html', error=error)
     quarydata = db.execute('SELECT * FROM books WHERE isbn = (:isbn)',
             {'isbn': isbn}).fetchall()
-    reviewquery = db.execute(('SELECT review, rating, review_date, username'
-        ' FROM reviews WHERE book_id = (:isbn)'), {'isbn': isbn})
+    reviewquery = db.execute(('SELECT r.review, r.rating, r.review_date, u.username'
+    ' FROM reviews AS r JOIN users AS u ON r.userid=u.userid '
+    'WHERE r.book_id = (:isbn)')
+    , {'isbn': isbn})
     reviews = reviewquery.fetchall()
     username = session.get('USERNAME')
     print(username)
-    reviewedquery = db.execute(('SELECT review FROM reviews'
-        ' WHERE username = (:username) AND book_id = (:isbn)'),
-        {'username': username, 'isbn': isbn}).fetchall()
+    reviewedquery = db.execute('SELECT review FROM reviews'
+        ' WHERE book_id = (:isbn) AND userid = (SELECT userid FROM users '
+        'WHERE username =(:username))',
+         {'username': username, 'isbn': isbn}).fetchall()
     REVIEWED_FLAG = False
     if reviewedquery:
         REVIEWED_FLAG = True
@@ -154,13 +173,18 @@ def review():
         text = request.form.get('review')
         rating = request.form.get('rate')
         today = datetime.today()
+        query= db.execute('SELECT userid FROM users WHERE username = (:username)',
+            {'username': username}).fetchone()
+
+        userid = query[0]
+        print(userid)
         db.execute(('INSERT INTO reviews (review, rating, review_date,'
-            ' book_id, username) VALUES (:text, :rating, :today, :isbn,'
-            ' :username)'), {'text': text, 'rating': rating, 'today': today,
-                'isbn': isbn, 'username': username})
+            ' book_id, userid) VALUES (:text, :rating, :today, :isbn,'
+            ' :userid)'), {'text': text, 'rating': rating, 'today': today,
+                'isbn': isbn, 'userid': userid})
         db.commit()
         flash('Review posted for {}'.format(title))
-        return redirect(url_for('books', isbn=isbn))
+       # return redirect(url_for('books', isbn=isbn))
     return render_template('reviewPage.html', title=title, author=author)
 
 
@@ -212,6 +236,11 @@ def login():
 def register():
    
     return render_template("register.html")
+
+@app.route("/home")
+def home():
+   
+    return render_template("homePage.html")
 
 if __name__ == "__main__":
   app.run(debug=True)
