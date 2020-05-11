@@ -2,7 +2,7 @@ import os
 import requests
 from datetime import datetime
 from passlib.hash import sha256_crypt
-from flask import request, jsonify
+from flask import request, jsonify, redirect
 from flask import Flask, flash, render_template
 from flask import Flask, session
 from flask_session import Session
@@ -69,7 +69,7 @@ def userregister():
         
 
             
-@app.route("/login", methods=["POST"])   
+@app.route("/home", methods=["POST"])   
 def userlogin():
 
     error = None
@@ -122,8 +122,10 @@ def search():
         quarydata = db.execute(("SELECT * FROM books WHERE title LIKE (:qvalue)"
         " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) ORDER BY isbn ASC LIMIT 10 "), {'qvalue': search})
         data = quarydata.fetchall()
+        username = session.get('USERNAME')
         print(data)
-        return render_template('resultsPage.html', results= data)
+        
+        return render_template('resultsPage.html', results= data, username= username)
     except Exception as e:
         print(e)
         error = "Something is not right"
@@ -148,8 +150,10 @@ def books(isbn):
     ' FROM reviews AS r JOIN users AS u ON r.userid=u.userid '
     'WHERE r.book_id = (:isbn)')
     , {'isbn': isbn})
+   
     reviews = reviewquery.fetchall()
     username = session.get('USERNAME')
+    print('still books')
     print(username)
     reviewedquery = db.execute('SELECT review FROM reviews'
         ' WHERE book_id = (:isbn) AND userid = (SELECT userid FROM users '
@@ -160,32 +164,43 @@ def books(isbn):
         REVIEWED_FLAG = True
 
     return render_template('booksPage.html', book=quarydata[0], reviews=reviews,
-            reviewed=REVIEWED_FLAG,  review_nums=review_counts(isbn))
-            #review_nums=review_counts(isbn))
+            reviewed=REVIEWED_FLAG,  review_nums=review_counts(isbn),username=username)
+           
 
-@app.route('/review', methods=['GET', 'POST'])
-def review():
+@app.route('/books/<string:isbn>', methods=["POST"])
+def review(isbn):
     title = request.args.get('title', None)
     author = request.args.get('author', None)
-    if request.method == 'POST':
-        username = session.get('USERNAME')
-        isbn = request.args.get('isbn', None)
-        text = request.form.get('review')
-        rating = request.form.get('rate')
-        today = datetime.today()
-        query= db.execute('SELECT userid FROM users WHERE username = (:username)',
-            {'username': username}).fetchone()
+    username = session.get('USERNAME')
 
-        userid = query[0]
-        print(userid)
+ 
+    text = request.form.get('review')
+    rating = request.form.get('rate')
+    today = datetime.today()
+    query= db.execute('SELECT userid FROM users WHERE username = (:username)',
+        {'username': username}).fetchone()
+
+    userid = query[0]
+    print('hello')
+    print(isbn)
+    print(userid)
+    if rating is None:
+        rating=0
+    try:
         db.execute(('INSERT INTO reviews (review, rating, review_date,'
             ' book_id, userid) VALUES (:text, :rating, :today, :isbn,'
             ' :userid)'), {'text': text, 'rating': rating, 'today': today,
                 'isbn': isbn, 'userid': userid})
         db.commit()
+        print('done')
+        return redirect(request.referrer)
+    except Exception as e:
         flash('Review posted for {}'.format(title))
-       # return redirect(url_for('books', isbn=isbn))
-    return render_template('reviewPage.html', title=title, author=author)
+        print(e)
+        error ="Something went wrong with saving your review please refresh the page"
+        return render_template('error.html', error=error)
+        
+        
 
 
 def review_counts(isbn):
@@ -239,8 +254,9 @@ def register():
 
 @app.route("/home")
 def home():
-   
-    return render_template("homePage.html")
+    username= session.get("USERNAME")
+    print(session)
+    return render_template("homePage.html", username= username)
 
 if __name__ == "__main__":
   app.run(debug=True)

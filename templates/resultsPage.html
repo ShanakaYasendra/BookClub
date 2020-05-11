@@ -11,11 +11,7 @@
         background-image: none;
 
     }
-    .input-group{
-    margin: 5vh;
-    align-items: center;
-}
-    
+ 
 
     
 </style>
@@ -24,26 +20,49 @@
 
 {% block search %}
 
-            
+    <div class="row">
+        <div class="col-lg-2 col-sm-1"></div>
+        <div class= "col-lg-8 col-sm-10">
             <form action="{{ url_for('search') }}" method="POST"> 
-                <div class="input-group">
+                <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Book Name, Author, ISBN" aria-label="Enter details to search" aria-describedby="button-addon2"name="qvalue">
+                       
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary" type="submit" id="search">Serach</button>
+                       </div>
+                   </div>
+            </form>
+        </div>
+        <div class="col-lg-2 col-sm-1"></div>
+
+    </div>
+            
+            
                 
-                    <input type="text" class="form-control" placeholder="Book Name, Author, ISBN" aria-label="Enter details to search" aria-describedby="button-addon4" name="qvalue">
-                    <div class="input-group-append" id="button-addon4">
-                      <button class="btn btn-outline-secondary" type="submit">Search</button>
-                     
-                    </div>
-                </div>
-             </form>
-             <h1 class="mt-5 text-center">Search Results</h1>  
-   
-  
-   
-    <div class="list-group">
+                 
+         
+   <div class="row">
+    <div class="col-lg-2 col-sm-1"></div>
+    <div class= "col-lg-8 col-sm-10">
+     <div class="list-group">
+        <h1 class="mt-5 text-center">Search Results</h1>  
+         <ol>
         {% for entry in results %}
-        <a href="{{ url_for('books',isbn=entry.isbn) }}" class="list-group-item list-group-item-action">{{ entry.title }} by {{ entry.author }}<br>ISBN: {{ entry.isbn }}</a>
+        <li>
+        <a href="{{ url_for('books',isbn=entry.isbn) }}" class="list-group-item list-group-item-action">{{ entry.title }} by: {{ entry.author }}<br>ISBN: {{ entry.isbn }}</a>
         {% else %}
             <p class="lead">No matches found!</p>
+            </li>
         {% endfor %}
+         </ol> 
+        
+        <div class="alert alert-info" role="alert">
+         Only first 20 records will display. If the Book you looking not in the list try serch with more details
+    
+        </div>
     </div>
+    <div class="col-lg-2 col-sm-1"></div>
+
+
+   </div>
 {% endblock %}

@@ -67,17 +67,19 @@ body {
     padding: 50px 60px;
     margin-top: 20vh;
     -webkit-box-shadow: -1px 0px 47px 10px rgba(0,0,0,0.75);
--moz-box-shadow: -1px 0px 47px 10px rgba(0,0,0,0.75);
-box-shadow: -1px 0px 47px 10px rgba(243, 240, 240, 0.75);
+    -moz-box-shadow: -1px 0px 47px 10px rgba(0,0,0,0.75);
+    box-shadow: -1px 0px 47px 10px rgba(243, 240, 240, 0.75);
 }
-
-.input-group{
-    margin: 30vh;
+h1{
     align-items: center;
 }
+.input-group{
+    margin: 5vh;
+    align-items: center;
+}
+.nav-item{
+    align-items: center;
 
-.nav-link{
-    align-items: flex-end;
 }
 .list-group{
     align-items: center;

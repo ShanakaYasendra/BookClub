@@ -1,9 +1,19 @@
 {% extends "mainPagelayout.html" %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.checked {
+  color: orange;
+}
+</style>
+{% endblock %}
 {% block search %}
     <div class="container">
         <div class="row text-center">
-            <h3 class="mt-5">{{ book.title }} by {{ book.author }} ({{ book.year }})</h3>
+            <h3 class="mt-5">{{ book.title }} by {{ book.author }} ({{ book.year }})</br></h3>
             <p class="lead">
+            </br>
                 ISBN: {{ book.isbn }}<br>
                 Number of ratings: {{ review_nums['ratings_count'] }}<br>
                 Average rating: {{ review_nums['average_rating'] }}<br>
@@ -15,6 +25,14 @@
         {% for review in reviews %}
             <div class="card-body">
                 <small class="text-muted">{{ review.username }} rated {{ review.rating }}/5 on {{ review.review_date}}</small>
+                </br>
+                {% for n in range(5) %}
+                {% if n< review.rating  %}
+                <span class="fa fa-star checked"></span>
+                {% else %}
+                <span class="fa fa-star"></span>
+                {% endif %}
+                {% endfor %}
                 <p>{{ review.review }}</p>
                 <hr>
             </div>
@@ -23,17 +41,35 @@
         {% endfor %}
     <div>
         {% if reviewed %}
-            <button type="button" class="btn btn-primary btn-lg" onclick="reviewedNotify()">Write a review</button>
-            <script>
-            function reviewedNotify() {
-                alert("You have already reviewed this book.");
-            }
-            </script>
-        {% else %}
-            <a href="{{ url_for('review', isbn=book.isbn, title=book.title, author=book.author) }}">
+            <button type="button" class="btn btn-primary btn-lg" disabled>Write a review</button>
+            
+        
+            {% else %}
+            <h3 class="mt-5 text-center">Write your review</h3>
+            <form method="POST" action="{{url_for('review',isbn=book.isbn)}}">
+                <div class="rate text-center">
+                    <input type="radio" id="star5" name="rate" value="5" />
+                    <label for="star5" title="text">5 stars</label>
+                    <input type="radio" id="star4" name="rate" value="4" />
+                    <label for="star4" title="text">4 stars</label>
+                    <input type="radio" id="star3" name="rate" value="3" />
+                    <label for="star3" title="text">3 stars</label>
+                    <input type="radio" id="star2" name="rate" value="2" />
+                    <label for="star2" title="text">2 stars</label>
+                    <input type="radio" id="star1" name="rate" value="1" />
+                    <label for="star1" title="text">1 star</label>
+                </div>
+                <div class="form-group text-center">
+                    <textarea class="form-control" rows="4" cols="50" name="review" placeholder="What did you like or dislike?"></textarea>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+
+            <!--a href="{{ url_for('review', isbn=book.isbn, title=book.title, author=book.author) }}">
                 <button type="button" class="btn btn-primary btn-lg">Write a review
                 </button>
-            </a>
+            </a!-->
         {% endif %}
         {% if error %}
   <p class=error><strong>Error:</strong> {{ error }}
