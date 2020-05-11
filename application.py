@@ -44,12 +44,17 @@ def userregister():
         return render_template("register.html", error=error)
     elif db.execute("SELECT * FROM users WHERE username =:username",{"username": username}).rowcount >0 :
          error= 'username is not available'
-         
+         return render_template("register.html", error=error)
+    elif len(password)<=3:
+         error= 'Password can not be less than 4 charactor'
+         return render_template("register.html", error=error)
+    elif password == username or password == name:
+         error= 'Username or Name can not be use as password'
          return render_template("register.html", error=error)
     elif password != confirmPassword:
         error= 'Password is not match with the Confirm Password'
         return render_template("register.html", error=error)
-
+    
         # Create the user and update the table
     else:
         try:
@@ -57,7 +62,7 @@ def userregister():
             {"username": username,"password":h ,"name": name, "email":email})
             db.commit() 
             session["USERNAME"] = username           
-            return render_template("homePage.html")
+            return render_template("homePage.html", username= username)
 
         except Exception as e:
             flash ("Can not create the user !")
@@ -122,10 +127,14 @@ def search():
         quarydata = db.execute(("SELECT * FROM books WHERE title LIKE (:qvalue)"
         " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) ORDER BY isbn ASC LIMIT 10 "), {'qvalue': search})
         data = quarydata.fetchall()
+        countdata= db.execute(("SELECT COUNT(*) FROM books WHERE title LIKE (:qvalue)"
+        " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) "), {'qvalue': search}).fetchall()
         username = session.get('USERNAME')
         print(data)
-        
-        return render_template('resultsPage.html', results= data, username= username)
+       
+        quarycount=countdata[0][0]
+        print(quarycount)
+        return render_template('resultsPage.html', results= data, username= username,quarycount=quarycount)
     except Exception as e:
         print(e)
         error = "Something is not right"

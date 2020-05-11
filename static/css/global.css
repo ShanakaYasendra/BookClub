@@ -77,10 +77,27 @@ h1{
     margin: 5vh;
     align-items: center;
 }
-.nav-item{
-    align-items: center;
+#nav{
+    justify-items: center;
+}
 
+.navbar-text{
+    align-items: right;
 }
 .list-group{
     align-items: center;
+}
+.error{
+    color: red;
+}
+.lead{
+    align-items: center;
+}
+img.displayed {
+    display: block;
+    margin-left: auto;
+    margin-right: auto }
+.bookimage{
+    align-items: center;
+  
 }

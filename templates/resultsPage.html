@@ -1,5 +1,5 @@
 {% extends "mainPagelayout.html" %}
-
+{% block title %}Search Results{% endblock %}
 {% block head %}
 {{super()}}
 <style>
@@ -16,7 +16,7 @@
     
 </style>
 {% endblock %}
-{% block title %}Search{% endblock %}
+
 
 {% block search %}
 
@@ -55,11 +55,13 @@
             </li>
         {% endfor %}
          </ol> 
-        
+         {% if quarycount > 20 %}
         <div class="alert alert-info" role="alert">
-         Only first 20 records will display. If the Book you looking not in the list try serch with more details
-    
+        
+         Only first 20 / {{quarycount}} records will display. If the Book you looking not in the list try serch with more details
+       
         </div>
+        {% endif %}
     </div>
     <div class="col-lg-2 col-sm-1"></div>
 

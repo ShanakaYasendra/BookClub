@@ -1,4 +1,5 @@
 {% extends "mainPagelayout.html" %}
+{% block title %}Book Reviews{% endblock %}
 {% block head %}
 {{super()}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -9,11 +10,16 @@
 </style>
 {% endblock %}
 {% block search %}
+<div class ="row">
+
+    <div class ="col-lg-2 col-sm-1"></div>
+    <div class ="col-lg-8 col-sm-10">
     <div class="container">
         <div class="row text-center">
             <h3 class="mt-5">{{ book.title }} by {{ book.author }} ({{ book.year }})</br></h3>
+        </div>
+        <div class="row text-center">
             <p class="lead">
-            </br>
                 ISBN: {{ book.isbn }}<br>
                 Number of ratings: {{ review_nums['ratings_count'] }}<br>
                 Average rating: {{ review_nums['average_rating'] }}<br>
@@ -60,19 +66,19 @@
                     <label for="star1" title="text">1 star</label>
                 </div>
                 <div class="form-group text-center">
-                    <textarea class="form-control" rows="4" cols="50" name="review" placeholder="What did you like or dislike?"></textarea>
+                    <textarea class="form-control" rows="4" cols="50" name="review" placeholder="What did you like or dislike?" maxlength="255"></textarea>
                     <br>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </form>
 
-            <!--a href="{{ url_for('review', isbn=book.isbn, title=book.title, author=book.author) }}">
-                <button type="button" class="btn btn-primary btn-lg">Write a review
-                </button>
-            </a!-->
+          
         {% endif %}
         {% if error %}
   <p class=error><strong>Error:</strong> {{ error }}
 {% endif %}
     </div>
+</div>
+<div class ="col-lg-2 col-sm-1"></div>
+</div>
 {% endblock %}
