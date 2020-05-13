@@ -1,0 +1,61 @@
+{% extends "mainPagelayout.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block search %}
+<div class ="row">
+  <div class ="col-lg-2 col-sm-1"></div>
+<div class ="col-lg-8 col-sm-10">
+<h1> Update your Profile</h1>
+<form class="formcontain"action="{{ url_for('userupdate') }}" method="post">
+  {% if error %}
+      {% if error == 'Password and Email updated' %}
+      <div class="alert alert-success" role="alert">
+        {{ error }}
+      </div>
+      {% else %}
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+    {% endif %}
+    {% endif %}
+    <div class="form-group">
+        <label for="exampleInputUsername">Username</label>
+        <input type="username" class="form-control" id="exampleInputUsername" name ="username"  value='{{ username }}' disabled>
+    </div>
+        <div class="form-group">
+          <label for="exampleInputname">Name</label>
+          <input type="name" class="form-control" id="exampleInputname" name ="name"  value='{{ name }}' disabled>
+        </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">New Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" name= "password" maxlength="16">
+      </div>
+  
+     
+     <div class="form-group">
+        <label for="exampleInputName">Confirm Password</label>
+         <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" maxlength="16">
+      </div>
+ 
+
+  <div class="form-group">
+    <label for="exampleInputEmail1">Email</label>
+    <input type="email" class="form-control" id="exampleInputEmail1" name="email" value ='{{ email }}'>
+  </div>
+
+
+  <div class="form-group">
+    
+    <button type="submit" class="btn btn-success btn-block">Update</button>
+  </div>
+<div class="form-group">
+   
+    <a href="{{ url_for('home') }}"class="btn btn-light btn-block">Cancel</a>
+  </div>
+</form>
+
+</div>
+  
+  
+    {% endblock %}
+

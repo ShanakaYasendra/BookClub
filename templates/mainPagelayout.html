@@ -22,16 +22,16 @@
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                           <span class="navbar-toggler-icon"></span>
                         </button>
-                        <span class="navbar-text">
+                        <span class="navbar-text" style="align: right;">
                           Hi {{username}}
                         </span>
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                          <ul class="navbar-nav mr-auto" id="nav">
+                          <ul class="nav justify-content-center" id="nav">
                             <li class="nav-item active">
                               <a class="nav-link" href="{{url_for('home')}}">Home <span class="sr-only">(current)</span></a>
                             </li>
                             <li class="nav-item active">
-                              <a class="nav-link" href="{{ url_for('logout') }}">Change Password <span class="sr-only">(current)</span></a>
+                              <a class="nav-link" href="{{ url_for('update') }}">Profile <span class="sr-only">(current)</span></a>
                             </li>
                             <li class="nav-item active">
                               <a class="nav-link" href="{{ url_for('logout') }}">Log Out <span class="sr-only">(current)</span></a>
@@ -42,9 +42,13 @@
                     </nav>
                 </div>
             </div>
-          
+           
+             
                 {% block search %}
                 {% endblock %}
+            
+              <div class ="col-lg-2 col-sm-1"></div>
+              </div>
                
 
     </body>

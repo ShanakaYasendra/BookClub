@@ -1,5 +1,6 @@
 import os
 import requests
+import re
 from datetime import datetime
 from passlib.hash import sha256_crypt
 from flask import request, jsonify, redirect
@@ -267,5 +268,70 @@ def home():
     print(session)
     return render_template("homePage.html", username= username)
 
-if __name__ == "__main__":
+
+@app.route("/updateprofile")
+def update():
+    username= session.get("USERNAME")
+    try:
+        query= db.execute("SELECT email,name FROM  users WHERE username=(:username)",{"username": username}).fetchall()
+        name = query[0][1]
+        email = query[0][0]
+        return render_template('profilePage.html', email=email , name= name, username=username )
+    except Exception as e:
+        print(e)
+        error ="Something went wrong with saving your review please refresh the page"
+        return render_template('error.html', error=error)
+
+
+@app.route("/updateprofile", methods=["POST"])
+def userupdate():
+    username= session.get("USERNAME")
+    name=request.form.get("name")
+    password= request.form.get("password")
+    confirmPassword=request.form.get("confirmPassword")
+    email = request.form.get("email")
+    h = sha256_crypt.encrypt(password)
+    error =None
+    string_check= re.compile('%&') 
+    try:
+        if password =='' and email=='':
+            ererror= 'Nothing to update'
+            return render_template("profilePage.html", error=error)
+        elif email!='' and password=='':
+           db.execute("UPDATE users SET email=(:email) WHERE username=:username)",{'email':email,'username':username})
+           db.commit()
+           error="Email updated"
+           return render_template("profilePage.html", error=error)
+        
+        elif password == username or password == name:
+            error= 'Username or Name can not be use as password'
+            return render_template("profilePage.html", error=error)
+        elif string_check.search(password) != None:
+            error ='Password not allow &, %, /'
+            return render_template("profilePage.html", error=error)
+        elif password != confirmPassword:
+            error= 'Password is not match with the Confirm Password'
+            return redirect(request.referrer, error=error)
+        elif len(password)<=4:
+            error= 'Password can not be less than 4 charactor'
+            return render_template("profilePage.html", error=error)
+       
+        elif email =='' and password!='':
+            db.execute(("UPDATE users SET password=(:password) WHERE username=:username"),{'password':h,'username':username})
+            db.commit()
+            error="Password  updated"
+            return render_template("profilePage.html", error=error)
+        else:
+            db.execute(("UPDATE users SET password=(:password), email=(:email) WHERE username=:username"),{'password':h,'email':email,'username':username})
+            db.commit()
+            error="Password and Email updated"
+            return render_template("profilePage.html", error=error)
+    except Exception as e:
+        error=e
+        return render_template("profilePage.html", error=error)
+
+
+
+
+if __name__ == "__main__" :
   app.run(debug=True)
