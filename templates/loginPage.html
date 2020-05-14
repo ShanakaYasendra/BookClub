@@ -1,8 +1,14 @@
 {%extends "loginlayout.html" %}
 
 {% block title %}Index{% endblock %}
+
 {% block form %}
+<h1 style="margin-top: 10vh; margin-bottom: 10vh; " >Welcome to Book Club!</h1>
 <form class="formcontain" action="{{ url_for('userlogin') }}" method="post">
+  <h2>Login</h2>
+  {% if error %}
+  <p class=error><strong>Error:</strong> {{ error }}
+{% endif %}
           {% endblock %}
 {% block button %}Login{% endblock %}
 {% block containt %}
@@ -20,9 +26,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  {% if error %}
-  <p class=error><strong>Error:</strong> {{ error }}
-{% endif %}
+ 
 {% endblock%}
 
 

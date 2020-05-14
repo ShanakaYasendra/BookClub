@@ -90,14 +90,14 @@ def userlogin():
             error= 'Password can not be blank'
             return render_template("loginPage.html", error=error)
         else:
-            print(username)
+          
             quarydata = db.execute("SELECT * FROM users WHERE username =:username",{"username": username}).fetchall()
-            print(quarydata)
+            
             pass1= quarydata[0][2]
             user =quarydata[0][1]
-            print(pass1)
+         
             userid= quarydata[0][0]
-            print(userid)
+            
             if quarydata is None:
                 error = "Invalid credentials 13, try again."
                 return render_template("loginPage.html", error=error)
@@ -121,59 +121,68 @@ def userlogin():
          
 @app.route("/search", methods=["POST"])
 def search():
-    try:
-        qvalue = request.form.get('qvalue')
-        print(qvalue)
-        search = '%' + qvalue + '%'
-        quarydata = db.execute(("SELECT * FROM books WHERE title LIKE (:qvalue)"
-        " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) ORDER BY isbn ASC LIMIT 10 "), {'qvalue': search})
-        data = quarydata.fetchall()
-        countdata= db.execute(("SELECT COUNT(*) FROM books WHERE title LIKE (:qvalue)"
-        " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) "), {'qvalue': search}).fetchall()
-        username = session.get('USERNAME')
-        print(data)
+    username = session.get('USERNAME')
+    if username is None:
+        return render_template("loginPage.html")
+    else:
+        try:
+            qvalue = request.form.get('qvalue')
+            print(qvalue)
+            search = '%' + qvalue + '%'
+            quarydata = db.execute(("SELECT * FROM books WHERE title LIKE (:qvalue)"
+            " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) ORDER BY isbn ASC LIMIT 10 "), {'qvalue': search})
+            data = quarydata.fetchall()
+            countdata= db.execute(("SELECT COUNT(*) FROM books WHERE title LIKE (:qvalue)"
+            " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) "), {'qvalue': search}).fetchall()
+        
+            print(data)
        
-        quarycount=countdata[0][0]
-        print(quarycount)
-        return render_template('resultsPage.html', results= data, username= username,quarycount=quarycount)
-    except Exception as e:
-        print(e)
-        error = "Something is not right"
-        return render_template("error.html", error=error)		
+            quarycount=countdata[0][0]
+            print(quarycount)
+            return render_template('resultsPage.html', results= data, username= username,quarycount=quarycount)
+        except Exception as e:
+            print(e)
+            error = "Something is not right"
+            return render_template("error.html", error=error)		
 
 
 @app.route('/books/<string:isbn>')
 def books(isbn):
-    try:
-        r_count=review_counts(isbn)
-        if r_count =='Response [404]':
-         print(error)
-         return render_template('bookPage.html', error=error)
-
-    except Exception as e:
-        error = "ISBN is Invalid"
-        print(error)
-        return render_template('error.html', error=error)
-    quarydata = db.execute('SELECT * FROM books WHERE isbn = (:isbn)',
-            {'isbn': isbn}).fetchall()
-    reviewquery = db.execute(('SELECT r.review, r.rating, r.review_date, u.username'
-    ' FROM reviews AS r JOIN users AS u ON r.userid=u.userid '
-    'WHERE r.book_id = (:isbn)')
-    , {'isbn': isbn})
-   
-    reviews = reviewquery.fetchall()
     username = session.get('USERNAME')
-    print('still books')
-    print(username)
-    reviewedquery = db.execute('SELECT review FROM reviews'
-        ' WHERE book_id = (:isbn) AND userid = (SELECT userid FROM users '
-        'WHERE username =(:username))',
-         {'username': username, 'isbn': isbn}).fetchall()
-    REVIEWED_FLAG = False
-    if reviewedquery:
-        REVIEWED_FLAG = True
+    if username ==None:
+        print(username)
+        return render_template("loginPage.html")
+    else:
+        try:
+            r_count=review_counts(isbn)
+            if r_count =='Response [404]':
+                print(error)
+                return render_template('bookPage.html', error=error)
 
-    return render_template('booksPage.html', book=quarydata[0], reviews=reviews,
+        except Exception as e:
+            error = "ISBN is Invalid"
+            print(error)
+            return render_template('error.html', error=error)
+        quarydata = db.execute('SELECT * FROM books WHERE isbn = (:isbn)',
+        {'isbn': isbn}).fetchall()
+        reviewquery = db.execute(('SELECT r.review, r.rating, r.review_date, u.username'
+        ' FROM reviews AS r JOIN users AS u ON r.userid=u.userid '
+        'WHERE r.book_id = (:isbn)')
+        , {'isbn': isbn})
+   
+        reviews = reviewquery.fetchall()
+   
+        print('still books')
+        print(username)
+        reviewedquery = db.execute('SELECT review FROM reviews'
+            ' WHERE book_id = (:isbn) AND userid = (SELECT userid FROM users '
+            'WHERE username =(:username))',
+            {'username': username, 'isbn': isbn}).fetchall()
+        reviwed_flag = False
+        if reviewedquery:
+            reviwed_flag = True
+
+        return render_template('booksPage.html', book=quarydata[0], reviews=reviews,
             reviewed=REVIEWED_FLAG,  review_nums=review_counts(isbn),username=username)
            
 
@@ -182,33 +191,36 @@ def review(isbn):
     title = request.args.get('title', None)
     author = request.args.get('author', None)
     username = session.get('USERNAME')
+    print(username)
+    if username ==None:
+        print(username)
+        return render_template("loginPage.html")
+    else:    
+        text = request.form.get('review')
+        rating = request.form.get('rate')
+        today = datetime.today()
+        query= db.execute('SELECT userid FROM users WHERE username = (:username)',
+            {'username': username}).fetchone()
 
- 
-    text = request.form.get('review')
-    rating = request.form.get('rate')
-    today = datetime.today()
-    query= db.execute('SELECT userid FROM users WHERE username = (:username)',
-        {'username': username}).fetchone()
-
-    userid = query[0]
-    print('hello')
-    print(isbn)
-    print(userid)
-    if rating is None:
-        rating=0
-    try:
-        db.execute(('INSERT INTO reviews (review, rating, review_date,'
-            ' book_id, userid) VALUES (:text, :rating, :today, :isbn,'
-            ' :userid)'), {'text': text, 'rating': rating, 'today': today,
+        userid = query[0]
+        print('hello')
+        print(isbn)
+        print(userid)
+        if rating is None:
+            rating=0
+        try:
+            db.execute(('INSERT INTO reviews (review, rating, review_date,'
+                ' book_id, userid) VALUES (:text, :rating, :today, :isbn,'
+                ' :userid)'), {'text': text, 'rating': rating, 'today': today,
                 'isbn': isbn, 'userid': userid})
-        db.commit()
-        print('done')
-        return redirect(request.referrer)
-    except Exception as e:
-        flash('Review posted for {}'.format(title))
-        print(e)
-        error ="Something went wrong with saving your review please refresh the page"
-        return render_template('error.html', error=error)
+            db.commit()
+            print('done')
+            return redirect(request.referrer)
+        except Exception as e:
+            flash('Review posted for {}'.format(title))
+            print(e)
+            error ="Something went wrong with saving your review please refresh the page"
+            return render_template('error.html', error=error)
         
         
 
@@ -243,6 +255,7 @@ def api(isbn):
 @app.route("/index")
 def logout():
     session.clear()
+    
     flash('You have successfully logged out.')
     print(session)
     return render_template("indexPage.html")
@@ -265,22 +278,28 @@ def register():
 @app.route("/home")
 def home():
     username= session.get("USERNAME")
-    print(session)
-    return render_template("homePage.html", username= username)
+    if username is None:
+        return render_template("loginPage.html")
+    else:
+        return render_template("homePage.html", username= username)
 
 
 @app.route("/updateprofile")
 def update():
     username= session.get("USERNAME")
-    try:
-        query= db.execute("SELECT email,name FROM  users WHERE username=(:username)",{"username": username}).fetchall()
-        name = query[0][1]
-        email = query[0][0]
-        return render_template('profilePage.html', email=email , name= name, username=username )
-    except Exception as e:
-        print(e)
-        error ="Something went wrong with saving your review please refresh the page"
-        return render_template('error.html', error=error)
+    if username is None:
+        return render_template("loginPage.html")
+    else:
+        
+        try:
+            query= db.execute("SELECT email,name FROM  users WHERE username=(:username)",{"username": username}).fetchall()
+            name = query[0][1]
+            email = query[0][0]
+            return render_template('profilePage.html', email=email , name= name, username=username )
+        except Exception as e:
+            print(e)
+            error ="Something went wrong with saving your review please refresh the page"
+            return render_template('error.html', error=error)
 
 
 @app.route("/updateprofile", methods=["POST"])

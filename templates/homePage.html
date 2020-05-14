@@ -10,14 +10,16 @@
 </div>
 </div>
 <div class ="row">
-  <div class ="col-lg-2 col-sm-1"></div>
+  <div class ="col-lg-2 col-sm-1">
+    
+  </div>
 <div class ="col-lg-8 col-sm-10">
- <form action="{{ url_for('search') }}" method="POST"> 
-   <div class="input-group">
+ <form action="{{ url_for('search') }}" method="POST" id="search"> 
+   <div class="input-group mb-3">
 
-      <input type="text" class="form-control" placeholder="Book Name, Author, ISBN" aria-label="Enter details to search" aria-describedby="button-addon4" name="qvalue">
-      <div class="input-group-append" id="button-addon4">
-        <button class="btn btn-outline-secondary" type="submit">Search</button>
+      <input type="text" class="form-control" placeholder="Book Name, Author, ISBN" aria-label="Enter details to search" aria-describedby="button-addon2" name="qvalue">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="submit"id="button-addon2">Search</button>
      </div>
    </div>
  </form>

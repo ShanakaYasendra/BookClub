@@ -5,8 +5,9 @@
 <div class ="row">
   <div class ="col-lg-2 col-sm-1"></div>
 <div class ="col-lg-8 col-sm-10">
-<h1> Update your Profile</h1>
-<form class="formcontain"action="{{ url_for('userupdate') }}" method="post">
+
+<form class="formcontain"action="{{ url_for('userupdate') }}" method="post" style="margin-top: 5vh;">
+  <h2>Update Your Profile</h2>
   {% if error %}
       {% if error == 'Password and Email updated' %}
       <div class="alert alert-success" role="alert">

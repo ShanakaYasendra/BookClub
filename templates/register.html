@@ -4,6 +4,10 @@
 
 {% block form %}
 <form class="formcontain"action="{{ url_for('userregister') }}" method="post">
+  <h2>Create Your Account</h2>
+  {% if error %}
+  <p class=error><strong>Error:</strong> {{ error }}
+{% endif %}
           {% endblock %}
 
 {% block containts %}
@@ -14,11 +18,11 @@
  
 <div class="form-group">
     <label for="exampleInputName">Name</label>
-    <input type="text" class="form-control" id="exampleInputName" name="name" maxlength="20">
+    <input type="text" class="form-control" id="exampleInputName" name="name" maxlength="20"required>
       </div>
   <div class="form-group">
     <label for="exampleInputEmail1">Email Address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" name="email">
+    <input type="email" class="form-control" id="exampleInputEmail1" name="email"required>
   </div>
 {% endblock%}
 {% block button %}Register{% endblock %}
@@ -27,9 +31,7 @@
    
     <a href="{{ url_for('login') }}"class="btn btn-light btn-block">Cancel</a>
   </div>
-  {% if error %}
-    <p class=error><strong>Error:</strong> {{ error }}
-  {% endif %}
+ 
 {% endblock %}
 
 
