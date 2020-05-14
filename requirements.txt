@@ -2,5 +2,3 @@ Flask
 Flask-Session
 psycopg2-binary
 SQLAlchemy
-sha256_crypt
-datetime
