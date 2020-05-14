@@ -7,9 +7,26 @@
 
     <body>
 
-        <img src="{{ url_for('static', filename='image/book.jpg') }}" height="200px" class="displayed" alt="Photo by <a href=/photographer/adamci-33882>Adam Ciesielski</a> from <a href=https://freeimages.com/>FreeImages</a>">
-
-        {{error}}
-        Please Contact Admin
+        <div class ="row">
+            <div class ="col-lg-12 col-sm-12">
+              <div class="bookimage">
+                  <img src="{{ url_for('static', filename='image/book.jpg') }}" height="200px" class="displayed" alt="Photo by <a href=/photographer/adamci-33882>Adam Ciesielski</a> from <a href=https://freeimages.com/>FreeImages</a>">
+              </div>
+          </div>
+       </div>
+        
+      
+       <div class ="row">
+            <div class ="col-lg-2 col-sm-1">
+          
+            </div>
+           <div class ="col-lg-8 col-sm-10">
+             {{error}}
+            Please Contact Admin
+           </div>
+           <div class ="col-lg-2 col-sm-1">
+          
+        </div>
+        </div>
     </body>
 </html>

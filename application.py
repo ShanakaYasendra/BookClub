@@ -130,7 +130,7 @@ def search():
             print(qvalue)
             search = '%' + qvalue + '%'
             quarydata = db.execute(("SELECT * FROM books WHERE title LIKE (:qvalue)"
-            " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) ORDER BY isbn ASC LIMIT 10 "), {'qvalue': search})
+            " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) ORDER BY isbn ASC LIMIT 20 "), {'qvalue': search})
             data = quarydata.fetchall()
             countdata= db.execute(("SELECT COUNT(*) FROM books WHERE title LIKE (:qvalue)"
             " OR isbn LIKE (:qvalue) OR author LIKE (:qvalue) "), {'qvalue': search}).fetchall()
@@ -150,18 +150,18 @@ def search():
 def books(isbn):
     username = session.get('USERNAME')
     if username ==None:
-        print(username)
+        #print(username)
         return render_template("loginPage.html")
     else:
         try:
             r_count=review_counts(isbn)
             if r_count =='Response [404]':
-                print(error)
+                #print(error)
                 return render_template('bookPage.html', error=error)
 
         except Exception as e:
             error = "ISBN is Invalid"
-            print(error)
+           # print(error)
             return render_template('error.html', error=error)
         quarydata = db.execute('SELECT * FROM books WHERE isbn = (:isbn)',
         {'isbn': isbn}).fetchall()
@@ -172,8 +172,8 @@ def books(isbn):
    
         reviews = reviewquery.fetchall()
    
-        print('still books')
-        print(username)
+        #print('still books')
+       # print(username)
         reviewedquery = db.execute('SELECT review FROM reviews'
             ' WHERE book_id = (:isbn) AND userid = (SELECT userid FROM users '
             'WHERE username =(:username))',
@@ -183,7 +183,7 @@ def books(isbn):
             reviwed_flag = True
 
         return render_template('booksPage.html', book=quarydata[0], reviews=reviews,
-            reviewed=REVIEWED_FLAG,  review_nums=review_counts(isbn),username=username)
+            reviewed=reviwed_flag,  review_nums=review_counts(isbn),username=username)
            
 
 @app.route('/books/<string:isbn>', methods=["POST"])
@@ -191,9 +191,9 @@ def review(isbn):
     title = request.args.get('title', None)
     author = request.args.get('author', None)
     username = session.get('USERNAME')
-    print(username)
+   # print(username)
     if username ==None:
-        print(username)
+       # print(username)
         return render_template("loginPage.html")
     else:    
         text = request.form.get('review')
@@ -203,9 +203,9 @@ def review(isbn):
             {'username': username}).fetchone()
 
         userid = query[0]
-        print('hello')
-        print(isbn)
-        print(userid)
+       # print('hello')
+       # print(isbn)
+        #print(userid)
         if rating is None:
             rating=0
         try:
@@ -214,11 +214,11 @@ def review(isbn):
                 ' :userid)'), {'text': text, 'rating': rating, 'today': today,
                 'isbn': isbn, 'userid': userid})
             db.commit()
-            print('done')
+            #print('done')
             return redirect(request.referrer)
         except Exception as e:
             flash('Review posted for {}'.format(title))
-            print(e)
+           # print(e)
             error ="Something went wrong with saving your review please refresh the page"
             return render_template('error.html', error=error)
         
@@ -229,7 +229,7 @@ def review_counts(isbn):
     url = 'https://www.goodreads.com/book/review_counts.json'
     try:
         res = requests.get(url, params={"key": "GW0T0AAuRKRUVFIECnzXQ", "isbns": isbn})
-        print(res)    
+        #print(res)    
         return res.json()['books'][0]
     except Exception as e:
         flash ("ISBN not found")
@@ -257,7 +257,7 @@ def logout():
     session.clear()
     
     flash('You have successfully logged out.')
-    print(session)
+   # print(session)
     return render_template("indexPage.html")
 
 
